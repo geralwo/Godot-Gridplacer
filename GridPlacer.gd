@@ -69,7 +69,7 @@ func _set_grid():
 					if random_rotate_z:
 						instance.rotate_z(deg_to_rad(90 * (randi() % 4)))
 				add_child(instance)
-				instance.position = coord + self.global_transform.origin
+				instance.global_transform.origin = coord + self.global_transform.origin
 				instance.owner = self
 
 func _clear_children():
