@@ -15,6 +15,7 @@ extends Node3D
 	set(_v):
 		grid_spacing = _v
 		_update_grid()
+@export var instance_scale : Vector3 = Vector3.ONE
 @export var random_rotate : bool = false :
 	set(_v):
 		random_rotate = _v
@@ -32,9 +33,6 @@ var random_rotate_z : bool = false :
 	set(_v):
 		random_rotate_z = _v
 		_update_grid()
-
-func _ready():
-	_set_grid()
 
 func _update_grid():
 	if is_inside_tree():
@@ -68,9 +66,10 @@ func _set_grid():
 						instance.rotate_y(deg_to_rad(90 * (randi() % 4)))
 					if random_rotate_z:
 						instance.rotate_z(deg_to_rad(90 * (randi() % 4)))
+				instance.scale = instance_scale
 				add_child(instance)
 				instance.global_transform.origin = coord + self.global_transform.origin
-				instance.owner = self
+				instance.owner = self.owner
 
 func _clear_children():
 	for c in get_children():
