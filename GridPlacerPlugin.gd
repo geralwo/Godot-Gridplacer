@@ -1,8 +1,6 @@
 @tool
 extends EditorPlugin
 
-var grid_placer = preload("res://addons/GridPlacer/GridPlacer.gd").new()
-
 func _enter_tree():
 	add_custom_type(
 		"GridPlacer",
