@@ -7,6 +7,7 @@ extends Node3D
 @export var grid_dimensions : Vector3i = Vector3i.ONE :
 	set(_v):
 		grid_dimensions = _v
+		# consider mpt checking for 0
 		while grid_dimensions[grid_dimensions.min_axis_index()] == 0:
 			grid_dimensions[grid_dimensions.min_axis_index()] = 1
 		_update_grid()
@@ -15,12 +16,30 @@ extends Node3D
 	set(_v):
 		grid_spacing = _v
 		_update_grid()
-@export var instance_scale : Vector3 = Vector3.ONE
+@export var uniform_scaling : bool = true :
+	set(_v):
+		uniform_scaling = _v
+		notify_property_list_changed()
+		_update_grid()
+@export var instance_scale : Vector3 = Vector3.ONE :
+	set(_v):
+		if uniform_scaling:
+			instance_scale.x = _v.x
+			instance_scale.y = _v.x
+			instance_scale.z = _v.x
+		else:
+			instance_scale = _v
+		_update_grid()
 @export var random_rotate : bool = false :
 	set(_v):
 		random_rotate = _v
 		notify_property_list_changed()
 		_update_grid()
+
+var instances = []
+var show_in_scene_view = Node.INTERNAL_MODE_BACK
+
+
 var random_rotate_x : bool = false :
 	set(_v):
 		random_rotate_x = _v
@@ -67,12 +86,20 @@ func _set_grid():
 					if random_rotate_z:
 						instance.rotate_z(deg_to_rad(90 * (randi() % 4)))
 				instance.scale = instance_scale
+				instances.append(instance)
 				add_child(instance)
-				instance.global_transform.origin = coord + self.global_transform.origin
+				instance.position = coord + self.global_transform.origin
+
 				instance.owner = self.owner
 
+func get_children(internal = true):
+	var children = []
+	for c in get_children(internal):
+		if c.name.begins_with("_grid_placer_"):
+			children.append(c)
+	return children
 func _clear_children():
-	for c in get_children():
+	for c in get_children(true):
 		if c.name.begins_with("_grid_placer_"):
 			remove_child(c)
 			c.queue_free()
